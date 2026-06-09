@@ -1,0 +1,182 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 14px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  color: #333353;
+  line-height: 1.55;
+  background-color: #f3f3f0;
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Improved focus states for accessibility - Siemens Petrol */
+*:focus-visible {
+  outline: 2px solid #009999;
+  outline-offset: 2px;
+}
+
+/* Custom scrollbar styling - Siemens palette */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f3f3f0;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #ccccd4;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #9999a9;
+}
+
+/* === Siemens Brand Component Library === */
+
+@layer components {
+  .card {
+    @apply bg-white rounded-xl border border-deep-blue-10 shadow-soft;
+    transition: box-shadow 0.2s ease, transform 0.2s ease;
+  }
+
+  .card:hover {
+    box-shadow: 0 4px 12px rgba(51, 51, 83, 0.08);
+  }
+
+  /* === Input styles === */
+  .input {
+    @apply w-full px-4 py-2.5 border border-deep-blue-20 rounded-lg text-sm text-deep-blue-80 bg-white;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .input:focus {
+    @apply border-brand-petrol;
+    box-shadow: 0 0 0 3px rgba(0, 153, 153, 0.12);
+    outline: none;
+  }
+
+  .input::placeholder {
+    color: #9999a9;
+  }
+
+  /* === Button styles === */
+  .btn {
+    @apply px-4 py-2.5 font-medium rounded-lg transition-all duration-200 text-sm;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+
+  .btn-primary {
+    @apply bg-brand-petrol text-white;
+    box-shadow: 0 1px 2px rgba(0, 153, 153, 0.2), 0 1px 3px rgba(0, 153, 153, 0.1);
+  }
+
+  .btn-primary:hover {
+    @apply bg-brand-petrol-dark;
+    box-shadow: 0 2px 6px rgba(0, 153, 153, 0.25), 0 2px 4px rgba(0, 153, 153, 0.15);
+  }
+
+  .btn-primary:active {
+    @apply bg-primary-700;
+    box-shadow: 0 1px 2px rgba(0, 153, 153, 0.2);
+  }
+
+  .btn-secondary {
+    @apply bg-deep-blue-10 text-deep-blue-80 border border-deep-blue-20 hover:bg-bright-sand hover:border-soft-sand active:bg-soft-sand;
+  }
+
+  .btn-ghost {
+    @apply text-secondary hover:bg-deep-blue-10 active:bg-bright-sand;
+  }
+
+  /* === Badges === */
+  .badge {
+    @apply inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold;
+    letter-spacing: 0.01em;
+  }
+
+  .badge-success {
+    @apply bg-brand-green/15 text-green;
+  }
+
+  .badge-warning {
+    @apply bg-soft-yellow/30 text-dark-yellow;
+  }
+
+  .badge-error {
+    @apply bg-red-light text-red;
+  }
+
+  .badge-info {
+    @apply bg-primary-soft text-brand-petrol;
+  }
+
+  .badge-muted {
+    @apply bg-deep-blue-10 text-deep-blue-60;
+  }
+
+  /* === Table styles === */
+  .table-header {
+    @apply bg-light-sand text-xs font-semibold text-secondary uppercase tracking-wider;
+    letter-spacing: 0.04em;
+  }
+
+  .table-row {
+    @apply border-b border-deep-blue-10 hover:bg-light-sand transition-colors;
+  }
+
+  /* === Section divider === */
+  .section-divider {
+    @apply border-t border-deep-blue-10;
+  }
+
+  /* === Gradient brand elements === */
+  .brand-gradient-hero {
+    background: linear-gradient(135deg, #00ffb9 0%, #00e6dc 100%);
+  }
+
+  .brand-gradient-soft {
+    background: linear-gradient(135deg, #00d7a0 0%, #00bedc 100%);
+  }
+
+  /* === Text colors === */
+  .text-brand { color: #009999; }
+  .text-brand-dark { color: #00646e; }
+  .text-brand-light { color: #00c1b6; }
+
+  /* === Border === */
+  .border-brand { border-color: #009999; }
+  .border-brand-light { border-color: #e5e5e9; }
+}
+
+/* === Utility: subtle Siemens divider === */
+@layer utilities {
+  .bg-content { background-color: #f3f3f0; }
+  .text-content { color: #333353; }
+  .text-content-soft { color: #66667e; }
+  .text-content-muted { color: #9999a9; }
+}
