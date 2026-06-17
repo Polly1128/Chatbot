@@ -15,6 +15,8 @@
 - **文件上传**：支持图片、PDF 等多种文件上传
 - **联网搜索**：可切换联网搜索模式
 - **个人设置**：用户 Profile 管理、语言切换、默认模型配置
+- **增强 Profile 弹窗**：支持位置、专业领域、兴趣、专业知识、电话号码、对话记忆开关、个人简介等字段配置
+- **AI 记忆管理**：查看、编辑、删除 AI 为用户生成的记忆条目，支持手动刷新同步
 
 ### 后台管理 (`/admin`)
 
@@ -53,7 +55,8 @@ src/
 │   ├── Sidebar.tsx      # 后台侧边栏
 │   ├── Tag.tsx
 │   ├── Toggle.tsx
-│   ├── TopBar.tsx       # 后台顶栏
+│   ├── ProfileModal.tsx # 个人 Profile 弹窗（后台管理页）
+│   ├── TopBar.tsx       # 后台顶栏（含用户头像入口）
 │   └── WelcomeMessage.tsx
 ├── config/
 │   └── menu.ts          # 菜单配置与面包屑逻辑
@@ -113,6 +116,35 @@ npm run preview
 npm run lint
 ```
 
+## Profile 弹窗功能
+
+### ChatBot 页面 (`/`) Profile 弹窗
+
+点击右上角用户名打开，包含以下字段：
+
+| 字段 | 类型 | 说明 |
+|------|------|------|
+| 位置 | 单选下拉 | 北京、上海、深圳、广州等 10 个城市 |
+| 专业领域 | 多选下拉 | IT、P&O、Sales、Finance、Operations 等 |
+| 兴趣 | 多选下拉 | AI、Mendix、SAP、数字化转型、机器学习等 |
+| 专业知识 | 多选下拉 | 法律知识、进出口知识、财务知识、项目管理知识等 |
+| 电话号码 | 文本输入 | 联系电话 |
+| 对话记忆 | 开关 | 开启后会话自动存储到 memory，为后续对话提供记忆 |
+| 个人简介 | 文本域 | 帮助 AI 了解用户背景，提供个性化回答 |
+
+### AI 记忆管理
+
+Profile 弹窗底部集成 AI 记忆管理区域：
+
+- **记忆展示**：以列表展示 AI 生成的记忆条目（内容、分类、时间）
+- **记忆编辑**：点击编辑按钮修改单条记忆内容
+- **记忆删除**：删除错误或不需要的记忆条目
+- **记忆刷新**：手动同步最新 AI 记忆数据
+
+### 后台管理页 (`/admin`) Profile 弹窗
+
+点击 TopBar 右上角用户头像打开，从右侧滑入，包含相同的 7 个字段配置。
+
 ## 设计规范
 
 项目采用 **Siemens 品牌设计规范**，主要色彩定义在 `tailwind.config.js` 中：
@@ -132,3 +164,4 @@ npm run lint
 - `AgentSkill` — Agent Skill（含触发条件、Prompt 模板、参数定义、使用统计）
 - `SkillCategory` — Skill 分类枚举
 - `SkillParameter` / `SkillTrigger` / `SkillPrompt` / `SkillUsage` — Skill 子类型
+- `MemoryItem` — AI 记忆条目（id、content、category、createdAt）
