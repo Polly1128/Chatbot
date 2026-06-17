@@ -1,12 +1,12 @@
-# Dayu Admin (大禹后台配置管理系统)
+# AI ChatBot & Admin Platform
 
-大禹 AI 智能助手后台配置管理系统，基于 Siemens 品牌设计规范构建，提供 ChatBot 前端交互界面和后台管理配置功能。
+AI 智能助手对话平台，包含前端 ChatBot 交互界面与后台管理系统。前端提供多工作区智能对话、AI Skill 自动匹配、个人 Profile 配置和 AI 记忆管理等功能；后台提供 Agent 管理、知识库配置、模型与样式定制等完整的运营管理能力。
 
 ## 功能概览
 
 ### ChatBot 前端 (`/`)
 
-- **多工作区切换**：支持 Siemens China、SAP、AskIT 等工作区，每个工作区有独立的推荐问题和知识范围
+- **多工作区切换**：支持多工作区独立管理，每个工作区有独立的推荐问题和知识范围
 - **智能体发现与选择**：浏览和选择不同类型的 Agent（通用助手、AskData Agent 等）
 - **AI Skill 自动匹配**：根据用户输入自动匹配并激活对应的 Agent Skill（销售数据分析、文档总结、代码审查、翻译、问题解答等）
 - **多模型选择**：支持 DeepSeek R1、GPT-4 Turbo、Claude 3 Sonnet 等模型切换
@@ -147,9 +147,9 @@ Profile 弹窗底部集成 AI 记忆管理区域：
 
 ## 设计规范
 
-项目采用 **Siemens 品牌设计规范**，主要色彩定义在 `tailwind.config.js` 中：
+项目采用专业品牌设计规范，主要色彩定义在 `tailwind.config.js` 中：
 
-- **品牌主色**：Siemens Petrol (`#009999`)
+- **品牌主色**：Petrol (`#009999`)
 - **品牌强调色**：Bold Green (`#00ffb9`)、Soft Green (`#00d7a0`)
 - **背景色**：Light Sand (`#f3f3f0`)
 - **文字色**：Deep Blue 系列 (`#333353` ~ `#e5e5e9`)
