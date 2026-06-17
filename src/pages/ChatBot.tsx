@@ -29,6 +29,16 @@ import {
   Cloud,
   PanelLeftClose,
   PanelLeftOpen,
+  MapPin,
+  Briefcase,
+  Heart,
+  BookOpen as BookOpenIcon,
+  Phone,
+  MessageSquare,
+  Brain,
+  Pencil,
+  Trash2,
+  Check,
 } from 'lucide-react';
 import type { AgentSkill } from '../types';
 
@@ -159,6 +169,73 @@ const mockUserProfile = {
   role: 'Workspace Owner',
   description: '',
 };
+
+// Profile 常量选项
+const LOCATION_OPTIONS = [
+  { value: 'beijing', label: '北京' },
+  { value: 'shanghai', label: '上海' },
+  { value: 'shenzhen', label: '深圳' },
+  { value: 'guangzhou', label: '广州' },
+  { value: 'chengdu', label: '成都' },
+  { value: 'nanjing', label: '南京' },
+  { value: 'wuhan', label: '武汉' },
+  { value: 'hangzhou', label: '杭州' },
+  { value: 'xian', label: '西安' },
+  { value: 'suzhou', label: '苏州' },
+];
+
+const EXPERTISE_OPTIONS = [
+  { value: 'it', label: 'IT' },
+  { value: 'po', label: 'P&O' },
+  { value: 'sales', label: 'Sales' },
+  { value: 'finance', label: 'Finance' },
+  { value: 'operations', label: 'Operations' },
+  { value: 'marketing', label: 'Marketing' },
+  { value: 'rd', label: 'R&D' },
+  { value: 'legal', label: 'Legal' },
+  { value: 'supply-chain', label: 'Supply Chain' },
+  { value: 'hr', label: 'HR' },
+];
+
+const INTEREST_OPTIONS = [
+  { value: 'ai', label: 'AI' },
+  { value: 'mendix', label: 'Mendix' },
+  { value: 'sap', label: 'SAP' },
+  { value: 'digital-transformation', label: '数字化转型' },
+  { value: 'machine-learning', label: '机器学习' },
+  { value: 'data-analysis', label: '数据分析' },
+  { value: 'cloud', label: '云计算' },
+  { value: 'iot', label: '物联网' },
+  { value: 'cybersecurity', label: '网络安全' },
+  { value: 'automation', label: '自动化' },
+];
+
+const KNOWLEDGE_OPTIONS = [
+  { value: 'legal', label: '法律知识' },
+  { value: 'import-export', label: '进出口知识' },
+  { value: 'finance', label: '财务知识' },
+  { value: 'hr', label: '人力资源知识' },
+  { value: 'project-management', label: '项目管理知识' },
+  { value: 'compliance', label: '合规知识' },
+  { value: 'quality', label: '质量管理知识' },
+  { value: 'procurement', label: '采购知识' },
+];
+
+// Mock AI 记忆数据
+interface MemoryItem {
+  id: string;
+  content: string;
+  category: string;
+  createdAt: string;
+}
+
+const mockMemories: MemoryItem[] = [
+  { id: 'mem-1', content: '用户经常询问SAP操作相关问题，特别是销售订单和采购订单模块', category: '使用偏好', createdAt: '2024-01-15 14:30' },
+  { id: 'mem-2', content: '用户偏好使用中文进行交流，技术术语接受英文', category: '语言偏好', createdAt: '2024-01-14 10:20' },
+  { id: 'mem-3', content: '用户所在部门为IT部门，主要关注数字化转型相关项目', category: '用户背景', createdAt: '2024-01-13 16:45' },
+  { id: 'mem-4', content: '用户倾向于获取简洁的步骤式回答，不喜欢冗长的背景介绍', category: '交互偏好', createdAt: '2024-01-12 09:15' },
+  { id: 'mem-5', content: '用户对Mendix低代码平台有浓厚兴趣，正在评估其可行性', category: '兴趣记录', createdAt: '2024-01-11 11:30' },
+];
 
 // Agent Skill 数据
 const mockSkills: AgentSkill[] = [
@@ -313,6 +390,21 @@ export default function ChatBot() {
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
   const [userProfile, setUserProfile] = useState(mockUserProfile);
   const [profileDescription, setProfileDescription] = useState(mockUserProfile.description);
+  // Profile 新增字段 state
+  const [profileLocation, setProfileLocation] = useState('');
+  const [profileExpertise, setProfileExpertise] = useState<string[]>([]);
+  const [profileInterests, setProfileInterests] = useState<string[]>([]);
+  const [profileKnowledge, setProfileKnowledge] = useState<string[]>([]);
+  const [profilePhone, setProfilePhone] = useState('');
+  const [profileMemoryEnabled, setProfileMemoryEnabled] = useState(false);
+  const [profileBio, setProfileBio] = useState('');
+  // AI 记忆相关 state
+  const [aiMemories, setAiMemories] = useState<MemoryItem[]>(mockMemories);
+  const [editingMemoryId, setEditingMemoryId] = useState<string | null>(null);
+  const [editingMemoryContent, setEditingMemoryContent] = useState('');
+  const [isMemoriesLoading, setIsMemoriesLoading] = useState(false);
+  // Profile 多选下拉 state
+  const [openMultiSelect, setOpenMultiSelect] = useState<string | null>(null);
   const [settingsLanguage, setSettingsLanguage] = useState('zh');
   const [settingsDefaultModel, setSettingsDefaultModel] = useState(mockModels[0]);
   const [webSearchEnabled, setWebSearchEnabled] = useState(false);
@@ -1187,52 +1279,458 @@ export default function ChatBot() {
         </footer>
       </main>
 
-      {/* User Profile Modal */}
+      {/* User Profile Modal - Enhanced */}
       {showProfileModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50" onClick={() => setShowProfileModal(false)}>
-          <div className="bg-white rounded-2xl w-full max-w-md shadow-2xl" onClick={(e) => e.stopPropagation()}>
-            <div className="flex items-center justify-between p-4 border-b border-deep-blue-10">
-              <h3 className="text-lg font-semibold text-deep-blue-80">个人设置</h3>
-              <button onClick={() => setShowProfileModal(false)} className="text-deep-blue-40 hover:text-deep-blue-60">
-                <X size={20} />
-              </button>
-            </div>
-            <div className="p-6 space-y-4">
-              <div className="flex items-center gap-4">
-                <div className="w-16 h-16 bg-gradient-to-br from-dark-purple to-soft-purple rounded-xl flex items-center justify-center text-white font-semibold text-xl">
+          <div
+            className="bg-white rounded-2xl w-full max-w-2xl max-h-[85vh] shadow-2xl flex flex-col animate-slide-in"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header */}
+            <div className="flex items-center justify-between px-5 py-4 border-b border-deep-blue-10 bg-gradient-to-r from-primary-soft/50 to-transparent">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-gradient-to-br from-dark-purple to-soft-purple rounded-full flex items-center justify-center text-white font-semibold shadow-soft">
                   {userProfile.avatar}
                 </div>
                 <div>
-                  <p className="font-semibold text-deep-blue-80">{userProfile.name}</p>
-                  <p className="text-sm text-deep-blue-60">{userProfile.role}</p>
+                  <h3 className="text-base font-semibold text-deep-blue-80">{userProfile.name}</h3>
+                  <p className="text-xs text-deep-blue-40">{userProfile.role}</p>
                 </div>
               </div>
-              <div>
-                <label className="block text-sm font-medium text-deep-blue-80 mb-2">
-                  个人描述
+              <button onClick={() => setShowProfileModal(false)} className="p-1.5 text-deep-blue-40 hover:text-deep-blue-80 hover:bg-light-sand rounded-lg transition-colors">
+                <X size={18} />
+              </button>
+            </div>
+
+            {/* Body */}
+            <div className="flex-1 overflow-y-auto px-5 py-4 space-y-5">
+              {/* 位置 - 单选下拉 */}
+              <div className="space-y-2">
+                <label className="flex items-center gap-2 text-sm font-medium text-deep-blue-60">
+                  <MapPin size={16} className="text-brand-petrol" />
+                  位置
                 </label>
-                <textarea
-                  value={profileDescription}
-                  onChange={(e) => setProfileDescription(e.target.value)}
-                  placeholder="请描述您的角色、专业领域或兴趣，这有助于我更好地为您服务..."
-                  className="w-full px-3 py-2 border border-deep-blue-10 rounded-lg text-sm resize-none focus:outline-none focus:border-brand-petrol"
-                  rows={4}
+                <select
+                  value={profileLocation}
+                  onChange={e => setProfileLocation(e.target.value)}
+                  className="w-full px-4 py-2.5 bg-white border border-deep-blue-20 rounded-lg text-sm text-deep-blue-80 hover:border-deep-blue-40 focus:outline-none focus:ring-2 focus:ring-brand-petrol focus:border-brand-petrol transition-all appearance-none cursor-pointer"
+                >
+                  <option value="">请选择城市</option>
+                  {LOCATION_OPTIONS.map(opt => (
+                    <option key={opt.value} value={opt.value}>{opt.label}</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* 专业领域 - 多选下拉 */}
+              <div className="space-y-2">
+                <label className="flex items-center gap-2 text-sm font-medium text-deep-blue-60">
+                  <Briefcase size={16} className="text-brand-petrol" />
+                  专业领域
+                </label>
+                <div className="relative">
+                  <button
+                    type="button"
+                    onClick={() => setOpenMultiSelect(openMultiSelect === 'expertise' ? null : 'expertise')}
+                    className="w-full px-4 py-2.5 bg-white border border-deep-blue-20 rounded-lg text-left flex items-center justify-between hover:border-deep-blue-40 focus:outline-none focus:ring-2 focus:ring-brand-petrol focus:border-brand-petrol transition-all"
+                  >
+                    <span className="text-deep-blue-40 text-sm truncate">
+                      {profileExpertise.length > 0 ? `已选择 ${profileExpertise.length} 项` : '请选择专业领域'}
+                    </span>
+                    <ChevronDown size={16} className={`text-deep-blue-40 transition-transform ${openMultiSelect === 'expertise' ? 'rotate-180' : ''}`} />
+                  </button>
+                  {openMultiSelect === 'expertise' && (
+                    <div className="absolute z-50 w-full mt-1 bg-white border border-deep-blue-20 rounded-lg shadow-card overflow-hidden">
+                      <div className="max-h-48 overflow-y-auto p-1">
+                        {EXPERTISE_OPTIONS.map(option => (
+                          <button
+                            key={option.value}
+                            onClick={() => {
+                              setProfileExpertise(prev =>
+                                prev.includes(option.value)
+                                  ? prev.filter(v => v !== option.value)
+                                  : [...prev, option.value]
+                              );
+                            }}
+                            className={`w-full px-3 py-2 text-left text-sm rounded-md flex items-center gap-2 transition-colors ${
+                              profileExpertise.includes(option.value)
+                                ? 'bg-primary-soft text-brand-petrol font-medium'
+                                : 'text-deep-blue-60 hover:bg-light-sand'
+                            }`}
+                          >
+                            <span className={`w-4 h-4 rounded border flex items-center justify-center shrink-0 ${
+                              profileExpertise.includes(option.value)
+                                ? 'bg-brand-petrol border-brand-petrol'
+                                : 'border-deep-blue-20'
+                            }`}>
+                              {profileExpertise.includes(option.value) && (
+                                <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                                </svg>
+                              )}
+                            </span>
+                            {option.label}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+                {profileExpertise.length > 0 && (
+                  <div className="flex flex-wrap gap-1.5 mt-1.5">
+                    {profileExpertise.map(value => {
+                      const opt = EXPERTISE_OPTIONS.find(o => o.value === value);
+                      return (
+                        <span key={value} className="inline-flex items-center gap-1 px-2.5 py-1 bg-soft-yellow/40 text-dark-yellow rounded-full text-xs font-medium">
+                          {opt?.label || value}
+                          <button onClick={() => setProfileExpertise(prev => prev.filter(v => v !== value))} className="hover:opacity-70">
+                            <X size={12} />
+                          </button>
+                        </span>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+
+              {/* 兴趣 - 多选下拉 */}
+              <div className="space-y-2">
+                <label className="flex items-center gap-2 text-sm font-medium text-deep-blue-60">
+                  <Heart size={16} className="text-brand-petrol" />
+                  兴趣
+                </label>
+                <div className="relative">
+                  <button
+                    type="button"
+                    onClick={() => setOpenMultiSelect(openMultiSelect === 'interests' ? null : 'interests')}
+                    className="w-full px-4 py-2.5 bg-white border border-deep-blue-20 rounded-lg text-left flex items-center justify-between hover:border-deep-blue-40 focus:outline-none focus:ring-2 focus:ring-brand-petrol focus:border-brand-petrol transition-all"
+                  >
+                    <span className="text-deep-blue-40 text-sm truncate">
+                      {profileInterests.length > 0 ? `已选择 ${profileInterests.length} 项` : '请选择兴趣方向'}
+                    </span>
+                    <ChevronDown size={16} className={`text-deep-blue-40 transition-transform ${openMultiSelect === 'interests' ? 'rotate-180' : ''}`} />
+                  </button>
+                  {openMultiSelect === 'interests' && (
+                    <div className="absolute z-50 w-full mt-1 bg-white border border-deep-blue-20 rounded-lg shadow-card overflow-hidden">
+                      <div className="max-h-48 overflow-y-auto p-1">
+                        {INTEREST_OPTIONS.map(option => (
+                          <button
+                            key={option.value}
+                            onClick={() => {
+                              setProfileInterests(prev =>
+                                prev.includes(option.value)
+                                  ? prev.filter(v => v !== option.value)
+                                  : [...prev, option.value]
+                              );
+                            }}
+                            className={`w-full px-3 py-2 text-left text-sm rounded-md flex items-center gap-2 transition-colors ${
+                              profileInterests.includes(option.value)
+                                ? 'bg-primary-soft text-brand-petrol font-medium'
+                                : 'text-deep-blue-60 hover:bg-light-sand'
+                            }`}
+                          >
+                            <span className={`w-4 h-4 rounded border flex items-center justify-center shrink-0 ${
+                              profileInterests.includes(option.value)
+                                ? 'bg-brand-petrol border-brand-petrol'
+                                : 'border-deep-blue-20'
+                            }`}>
+                              {profileInterests.includes(option.value) && (
+                                <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                                </svg>
+                              )}
+                            </span>
+                            {option.label}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+                {profileInterests.length > 0 && (
+                  <div className="flex flex-wrap gap-1.5 mt-1.5">
+                    {profileInterests.map(value => {
+                      const opt = INTEREST_OPTIONS.find(o => o.value === value);
+                      return (
+                        <span key={value} className="inline-flex items-center gap-1 px-2.5 py-1 bg-soft-purple/30 text-dark-purple rounded-full text-xs font-medium">
+                          {opt?.label || value}
+                          <button onClick={() => setProfileInterests(prev => prev.filter(v => v !== value))} className="hover:opacity-70">
+                            <X size={12} />
+                          </button>
+                        </span>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+
+              {/* 专业知识 - 多选下拉 */}
+              <div className="space-y-2">
+                <label className="flex items-center gap-2 text-sm font-medium text-deep-blue-60">
+                  <BookOpenIcon size={16} className="text-brand-petrol" />
+                  专业知识
+                </label>
+                <div className="relative">
+                  <button
+                    type="button"
+                    onClick={() => setOpenMultiSelect(openMultiSelect === 'knowledge' ? null : 'knowledge')}
+                    className="w-full px-4 py-2.5 bg-white border border-deep-blue-20 rounded-lg text-left flex items-center justify-between hover:border-deep-blue-40 focus:outline-none focus:ring-2 focus:ring-brand-petrol focus:border-brand-petrol transition-all"
+                  >
+                    <span className="text-deep-blue-40 text-sm truncate">
+                      {profileKnowledge.length > 0 ? `已选择 ${profileKnowledge.length} 项` : '请选择专业知识领域'}
+                    </span>
+                    <ChevronDown size={16} className={`text-deep-blue-40 transition-transform ${openMultiSelect === 'knowledge' ? 'rotate-180' : ''}`} />
+                  </button>
+                  {openMultiSelect === 'knowledge' && (
+                    <div className="absolute z-50 w-full mt-1 bg-white border border-deep-blue-20 rounded-lg shadow-card overflow-hidden">
+                      <div className="max-h-48 overflow-y-auto p-1">
+                        {KNOWLEDGE_OPTIONS.map(option => (
+                          <button
+                            key={option.value}
+                            onClick={() => {
+                              setProfileKnowledge(prev =>
+                                prev.includes(option.value)
+                                  ? prev.filter(v => v !== option.value)
+                                  : [...prev, option.value]
+                              );
+                            }}
+                            className={`w-full px-3 py-2 text-left text-sm rounded-md flex items-center gap-2 transition-colors ${
+                              profileKnowledge.includes(option.value)
+                                ? 'bg-primary-soft text-brand-petrol font-medium'
+                                : 'text-deep-blue-60 hover:bg-light-sand'
+                            }`}
+                          >
+                            <span className={`w-4 h-4 rounded border flex items-center justify-center shrink-0 ${
+                              profileKnowledge.includes(option.value)
+                                ? 'bg-brand-petrol border-brand-petrol'
+                                : 'border-deep-blue-20'
+                            }`}>
+                              {profileKnowledge.includes(option.value) && (
+                                <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                                </svg>
+                              )}
+                            </span>
+                            {option.label}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+                {profileKnowledge.length > 0 && (
+                  <div className="flex flex-wrap gap-1.5 mt-1.5">
+                    {profileKnowledge.map(value => {
+                      const opt = KNOWLEDGE_OPTIONS.find(o => o.value === value);
+                      return (
+                        <span key={value} className="inline-flex items-center gap-1 px-2.5 py-1 bg-primary-soft text-brand-petrol rounded-full text-xs font-medium">
+                          {opt?.label || value}
+                          <button onClick={() => setProfileKnowledge(prev => prev.filter(v => v !== value))} className="hover:opacity-70">
+                            <X size={12} />
+                          </button>
+                        </span>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+
+              {/* 电话号码 */}
+              <div className="space-y-2">
+                <label className="flex items-center gap-2 text-sm font-medium text-deep-blue-60">
+                  <Phone size={16} className="text-brand-petrol" />
+                  电话号码
+                </label>
+                <input
+                  type="tel"
+                  value={profilePhone}
+                  onChange={e => setProfilePhone(e.target.value)}
+                  placeholder="请输入联系电话"
+                  className="w-full px-4 py-2.5 bg-white border border-deep-blue-20 rounded-lg text-sm text-deep-blue-80 placeholder-deep-blue-40 hover:border-deep-blue-40 focus:outline-none focus:ring-2 focus:ring-brand-petrol focus:border-brand-petrol transition-all"
                 />
               </div>
+
+              {/* 对话记忆开关 */}
+              <div className="bg-light-sand/50 rounded-lg border border-deep-blue-10 px-4 py-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <MessageSquare size={16} className="text-brand-petrol" />
+                    <div>
+                      <span className="text-sm font-medium text-deep-blue-80">对话记忆</span>
+                      <p className="text-xs text-deep-blue-40 mt-0.5">开启后会话将被记录并自动存储，为后续对话提供记忆功能</p>
+                    </div>
+                  </div>
+                  <button
+                    role="switch"
+                    aria-checked={profileMemoryEnabled}
+                    onClick={() => setProfileMemoryEnabled(!profileMemoryEnabled)}
+                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                      profileMemoryEnabled
+                        ? 'bg-brand-petrol cursor-pointer shadow-sm'
+                        : 'bg-deep-blue-20 cursor-pointer'
+                    }`}
+                  >
+                    <span className={`inline-block h-4 w-4 transform rounded-full bg-white shadow-sm transition-transform ${
+                      profileMemoryEnabled ? 'translate-x-6' : 'translate-x-1'
+                    }`} />
+                  </button>
+                </div>
+              </div>
+
+              {/* 个人简介 */}
+              <div className="space-y-2">
+                <label className="flex items-center gap-2 text-sm font-medium text-deep-blue-60">
+                  <User size={16} className="text-brand-petrol" />
+                  个人简介
+                </label>
+                <textarea
+                  value={profileBio}
+                  onChange={e => setProfileBio(e.target.value)}
+                  placeholder="请输入个人简介，帮助AI更好地了解您的背景和需求，提供更贴合的个性化回答..."
+                  rows={4}
+                  className="w-full px-4 py-2.5 bg-white border border-deep-blue-20 rounded-lg text-sm text-deep-blue-80 placeholder-deep-blue-40 hover:border-deep-blue-40 focus:outline-none focus:ring-2 focus:ring-brand-petrol focus:border-brand-petrol transition-all resize-none"
+                />
+                <p className="text-xs text-deep-blue-40 text-right">{profileBio.length}/500</p>
+              </div>
+
+              {/* AI 记忆管理区域 */}
+              <div className="border-t border-deep-blue-10 pt-5 mt-5">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-2">
+                    <Brain size={16} className="text-brand-petrol" />
+                    <h4 className="text-sm font-semibold text-deep-blue-80">AI 记忆管理</h4>
+                    <span className="text-xs text-deep-blue-40">({aiMemories.length} 条)</span>
+                  </div>
+                  <button
+                    onClick={() => {
+                      setIsMemoriesLoading(true);
+                      setTimeout(() => {
+                        setAiMemories([...mockMemories]);
+                        setIsMemoriesLoading(false);
+                      }, 1000);
+                    }}
+                    disabled={isMemoriesLoading}
+                    className="flex items-center gap-1.5 px-3 py-1.5 text-xs text-brand-petrol hover:bg-primary-soft rounded-lg transition-colors disabled:opacity-50"
+                  >
+                    <RefreshCw size={12} className={isMemoriesLoading ? 'animate-spin' : ''} />
+                    刷新
+                  </button>
+                </div>
+
+                {isMemoriesLoading ? (
+                  <div className="flex items-center justify-center py-8">
+                    <div className="flex items-center gap-2 text-deep-blue-40">
+                      <RefreshCw size={16} className="animate-spin" />
+                      <span className="text-sm">正在同步记忆数据...</span>
+                    </div>
+                  </div>
+                ) : aiMemories.length === 0 ? (
+                  <div className="text-center py-8">
+                    <Brain size={24} className="text-deep-blue-20 mx-auto mb-2" />
+                    <p className="text-sm text-deep-blue-40">暂无AI记忆数据</p>
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    {aiMemories.map(memory => (
+                      <div
+                        key={memory.id}
+                        className="group p-3 bg-light-sand/50 rounded-lg border border-deep-blue-10 hover:border-deep-blue-20 transition-all"
+                      >
+                        {editingMemoryId === memory.id ? (
+                          /* 编辑模式 */
+                          <div className="space-y-2">
+                            <textarea
+                              value={editingMemoryContent}
+                              onChange={e => setEditingMemoryContent(e.target.value)}
+                              className="w-full px-3 py-2 bg-white border border-brand-petrol rounded-lg text-sm text-deep-blue-80 focus:outline-none focus:ring-2 focus:ring-brand-petrol resize-none"
+                              rows={3}
+                              autoFocus
+                            />
+                            <div className="flex items-center justify-end gap-2">
+                              <button
+                                onClick={() => setEditingMemoryId(null)}
+                                className="px-3 py-1 text-xs text-deep-blue-60 hover:bg-light-sand rounded-md transition-colors"
+                              >
+                                取消
+                              </button>
+                              <button
+                                onClick={() => {
+                                  setAiMemories(prev =>
+                                    prev.map(m =>
+                                      m.id === editingMemoryId
+                                        ? { ...m, content: editingMemoryContent }
+                                        : m
+                                    )
+                                  );
+                                  setEditingMemoryId(null);
+                                }}
+                                className="flex items-center gap-1 px-3 py-1 text-xs bg-brand-petrol text-white rounded-md hover:bg-brand-petrol-dark transition-colors"
+                              >
+                                <Check size={12} />
+                                保存
+                              </button>
+                            </div>
+                          </div>
+                        ) : (
+                          /* 展示模式 */
+                          <div>
+                            <div className="flex items-start justify-between gap-2">
+                              <p className="text-sm text-deep-blue-80 leading-relaxed flex-1">
+                                {memory.content}
+                              </p>
+                              <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
+                                <button
+                                  onClick={() => {
+                                    setEditingMemoryId(memory.id);
+                                    setEditingMemoryContent(memory.content);
+                                  }}
+                                  className="p-1 text-deep-blue-40 hover:text-brand-petrol hover:bg-primary-soft rounded transition-colors"
+                                  title="编辑"
+                                >
+                                  <Pencil size={13} />
+                                </button>
+                                <button
+                                  onClick={() => {
+                                    setAiMemories(prev => prev.filter(m => m.id !== memory.id));
+                                  }}
+                                  className="p-1 text-deep-blue-40 hover:text-red hover:bg-red-light rounded transition-colors"
+                                  title="删除"
+                                >
+                                  <Trash2 size={13} />
+                                </button>
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-2 mt-2">
+                              <span className="inline-flex items-center px-2 py-0.5 bg-primary-soft text-brand-petrol rounded text-xs font-medium">
+                                {memory.category}
+                              </span>
+                              <span className="text-xs text-deep-blue-40">
+                                {memory.createdAt}
+                              </span>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
-            <div className="flex justify-end gap-3 p-4 border-t border-deep-blue-10">
+
+            {/* Footer */}
+            <div className="flex items-center justify-end gap-3 px-5 py-4 border-t border-deep-blue-10 bg-light-sand/30">
               <button
                 onClick={() => setShowProfileModal(false)}
-                className="px-4 py-2 text-sm text-deep-blue-60 hover:bg-light-sand rounded-lg transition-colors"
+                className="px-4 py-2 text-sm text-deep-blue-60 hover:bg-light-sand rounded-lg border border-deep-blue-10 transition-colors"
               >
                 取消
               </button>
               <button
                 onClick={() => {
-                  setUserProfile({ ...userProfile, description: profileDescription });
+                  setUserProfile({ ...userProfile, description: profileBio });
                   setShowProfileModal(false);
                 }}
-                className="px-4 py-2 text-sm bg-siemens-petrol text-white rounded-lg hover:bg-siemens-petrol transition-colors"
+                className="px-5 py-2 text-sm font-medium text-white bg-brand-petrol hover:bg-brand-petrol-dark rounded-lg transition-colors shadow-soft"
               >
                 保存
               </button>

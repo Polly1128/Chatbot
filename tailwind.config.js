@@ -94,6 +94,15 @@ export default {
         'gradient-petrol-bold': 'linear-gradient(135deg, #00ffb9 0%, #00e6dc 100%)',
         'gradient-petrol-soft': 'linear-gradient(135deg, #00d7a0 0%, #00bedc 100%)',
       },
+      keyframes: {
+        'slide-in': {
+          '0%': { opacity: '0', transform: 'translateX(16px)' },
+          '100%': { opacity: '1', transform: 'translateX(0)' },
+        },
+      },
+      animation: {
+        'slide-in': 'slide-in 0.2s ease-out',
+      },
     },
   },
   plugins: [],
